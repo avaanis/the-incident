@@ -11,104 +11,256 @@
 
 body{
     margin:0;
-    background:#050505;
+    background:linear-gradient(#0f0f0f,#050505);
     color:#f2f2f2;
-    font-family:Consolas, "Courier New", monospace;
+    font-family:Consolas,"Courier New",monospace;
+
     display:flex;
     justify-content:center;
     align-items:flex-start;
+
     min-height:100vh;
     padding:40px 0;
+
+    overflow-x:hidden;
+
+    animation:terminal 20s infinite;
 }
 
+/* Moving grid */
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-2;
+
+    background-image:
+        linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+
+    background-size:40px 40px;
+
+    animation:gridMove 18s linear infinite;
+}
+
+/* Scanlines */
+
+body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+
+    background:
+        repeating-linear-gradient(
+            transparent 0px,
+            transparent 3px,
+            rgba(255,255,255,.02) 4px
+        );
+}
+
+/* Archive */
+
 .box{
+
     width:650px;
+
     border:2px solid #444;
+
     background:#0d0d0d;
+
     padding:40px;
+
     box-shadow:0 0 20px rgba(255,0,0,.15);
 
     animation:fadeIn 1.2s ease;
+
+    transition:.3s;
+
 }
 
+.box:hover{
+
+    box-shadow:
+        0 0 25px rgba(255,70,70,.2),
+        0 0 60px rgba(255,0,0,.08);
+
+}
+
+h1{
+
+    margin-top:0;
+    letter-spacing:3px;
+
+}
+
+.red{
+
+    color:#ff4a4a;
+    animation:warning 3s infinite;
+
+}
+
+hr{
+
+    border:0;
+    border-top:1px solid #333;
+    margin:20px 0;
+
+}
+
+ul{
+
+    line-height:1.8;
+
+}
+
+pre{
+
+    margin:8px 0 0 24px;
+    font-family:inherit;
+    color:#d8d8d8;
+
+}
+
+.button{
+
+    display:inline-block;
+
+    margin-top:20px;
+
+    padding:14px 30px;
+
+    border:1px solid #888;
+
+    color:white;
+
+    text-decoration:none;
+
+    transition:.2s;
+
+    animation:pulse 2.5s infinite;
+
+}
+
+.button:hover{
+
+    background:#222;
+    transform:translateY(-2px);
+
+}
+
+.cursor{
+
+    animation:cursor 1.2s infinite;
+
+}
+
+.small{
+
+    color:#8c8c8c;
+    font-size:14px;
+
+}
+
+::selection{
+
+    background:#ff4a4a;
+    color:black;
+
+}
+
+/* Animations */
+
 @keyframes fadeIn{
+
     from{
         opacity:0;
         transform:translateY(20px);
     }
+
     to{
         opacity:1;
-        transform:translateY(0);
+        transform:none;
     }
-}
 
-h1{
-    margin-top:0;
-    letter-spacing:3px;
-}
-
-.red{
-    color:#ff4a4a;
-}
-
-hr{
-    border:0;
-    border-top:1px solid #333;
-    margin:20px 0;
-}
-
-ul{
-    line-height:1.8;
-}
-
-pre{
-    margin:8px 0 0 24px;
-    font-family:inherit;
-    color:#d8d8d8;
-}
-
-.button{
-    display:inline-block;
-    margin-top:20px;
-    padding:14px 30px;
-    border:1px solid #888;
-    color:white;
-    text-decoration:none;
-    transition:.2s;
-
-    animation:pulse 2.2s infinite;
-}
-
-.button:hover{
-    background:#222;
-    box-shadow:0 0 15px rgba(255,255,255,.25);
 }
 
 @keyframes pulse{
-    0%{
+
+    0%,100%{
         box-shadow:0 0 0 rgba(255,255,255,0);
     }
+
     50%{
         box-shadow:0 0 15px rgba(255,255,255,.25);
     }
-    100%{
-        box-shadow:0 0 0 rgba(255,255,255,0);
+
+}
+
+@keyframes cursor{
+
+    0%,40%{
+        opacity:1;
     }
-}
 
-.cursor{
-    animation:blink 1s infinite;
-}
-
-@keyframes blink{
     50%{
+        opacity:.2;
+    }
+
+    60%{
+        opacity:1;
+    }
+
+    70%{
         opacity:0;
     }
+
+    100%{
+        opacity:1;
+    }
+
 }
 
-.small{
-    color:#8c8c8c;
-    font-size:14px;
+@keyframes warning{
+
+    0%,100%{
+        opacity:1;
+    }
+
+    50%{
+        opacity:.65;
+    }
+
+}
+
+@keyframes gridMove{
+
+    from{
+        transform:translateY(0);
+    }
+
+    to{
+        transform:translateY(40px);
+    }
+
+}
+
+@keyframes terminal{
+
+    0%,97%,100%{
+        filter:brightness(1);
+    }
+
+    98%{
+        filter:brightness(.75);
+    }
+
+    99%{
+        filter:brightness(1.08);
+    }
+
 }
 
 </style>
@@ -148,8 +300,11 @@ CIPRIKAND
 <p><strong>KNOWN ANOMALIES</strong></p>
 
 <ul>
+
 <li>■ A mazing (?)</li>
+
 <li>■ La "Chamelilize"</li>
+
 <li>■ Jennifer!!!</li>
 
 <li>
@@ -165,7 +320,9 @@ CIPRIKAND
 </li>
 
 <li>■ The Moon Man (?)</li>
+
 <li>■ Unauthorized Worldbuilding</li>
+
 </ul>
 
 <hr>
@@ -185,4 +342,5 @@ Awaiting input<span class="cursor">_</span>
 </div>
 
 </body>
+
 </html>
