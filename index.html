@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>THE INCIDENT</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+    margin:0;
+    background:linear-gradient(#0f0f0f,#050505);
+    color:#f2f2f2;
+    font-family:"Share Tech Mono",Consolas,"Courier New",monospace;
+
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+
+    min-height:100vh;
+    padding:40px 0;
+
+    overflow-x:hidden;
+
+    animation:terminal 20s infinite;
+}
+
+/* Moving grid */
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-2;
+
+    background-image:
+        linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+
+    background-size:40px 40px;
+
+    animation:gridMove 18s linear infinite;
+}
+
+/* Scanlines */
+
+body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+
+    background:
+        repeating-linear-gradient(
+            transparent 0px,
+            transparent 3px,
+            rgba(255,255,255,.02) 4px
+        );
+}
+
+/* vignette so the edges feel like a monitor, not a flat page */
+.vignette{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:5;
+    background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.65) 100%);
+}
+
+/* Archive */
+
+.box{
+
+    width:650px;
+    position:relative;
+
+    border:2px solid #444;
+
+    background:#0d0d0d;
+
+    padding:40px;
+
+    box-shadow:0 0 20px rgba(255,0,0,.15);
+
+    animation:fadeIn 1.2s ease;
+
+    transition:.3s;
+
+}
+
+.box:hover{
+
+    box-shadow:
+        0 0 25px rgba(255,70,70,.2),
+        0 0 60px rgba(255,0,0,.08);
+
+}
+
+/* case stamp, corner tag - update the "01/07" per page as you go */
+.stamp{
+    position:absolute;
+    top:-14px;
+    right:-14px;
+    border:2px solid #ff4a4a;
+    color:#ff4a4a;
+    background:#0d0d0d;
+    padding:5px 12px;
+    font-size:12px;
+    letter-spacing:2px;
+    transform:rotate(6deg);
+    opacity:.9;
+}
+
+h1{
+
+    margin-top:0;
+    letter-spacing:3px;
+    position:relative;
+
+}
+
+/* glitch effect on the title - same color as the title, jitter/shatter only, no color split */
+h1.glitch::before,
+h1.glitch::after{
+    content:attr(data-text);
+    position:absolute;
+    left:0; top:0;
+    width:100%;
+    overflow:hidden;
+    background:#0d0d0d;
+    color:#f2f2f2;
+}
+h1.glitch::before{
+    clip-path:inset(0 0 60% 0);
+    animation:glitchTop 4s infinite linear;
+}
+h1.glitch::after{
+    clip-path:inset(60% 0 0 0);
+    animation:glitchBottom 4s infinite linear;
+}
+
+/* scanning beam sweeping down the whole background, on a loop */
+.scan-beam{
+    position:fixed;
+    left:0;
+    top:-10%;
+    width:100%;
+    height:140px;
+    pointer-events:none;
+    z-index:6;
+    mix-blend-mode:screen;
+    background:linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(255,74,74,.05) 35%,
+        rgba(255,90,90,.14) 50%,
+        rgba(255,74,74,.05) 65%,
+        transparent 100%
+    );
+    animation:scanSweep 6s linear infinite;
+}
+@keyframes scanSweep{
+    0%{ top:-15%; }
+    100%{ top:110%; }
+}
+
+.red{
+
+    color:#ff4a4a;
+    animation:warning 3s infinite;
+
+}
+
+hr{
+
+    border:0;
+    border-top:1px solid #333;
+    margin:20px 0;
+
+}
+
+ul{
+
+    line-height:1.8;
+
+}
+
+pre{
+
+    margin:8px 0 0 24px;
+    font-family:inherit;
+    color:#d8d8d8;
+
+}
+
+.button{
+
+    display:inline-block;
+
+    margin-top:20px;
+
+    padding:14px 30px;
+
+    border:1px solid #888;
+
+    color:white;
+
+    text-decoration:none;
+
+    transition:.2s;
+
+    animation:pulse 2.5s infinite;
+
+}
+
+.button:hover{
+
+    background:#222;
+    transform:translateY(-2px);
+
+}
+
+.cursor{
+
+    animation:cursor 1.2s infinite;
+
+}
+
+.small{
+
+    color:#8c8c8c;
+    font-size:14px;
+
+}
+
+/* redacted subject name - hover or tap to reveal */
+.redacted{
+    background:#000;
+    color:#000;
+    padding:0 6px;
+    cursor:pointer;
+    border-radius:2px;
+    transition:.2s;
+}
+.redacted:hover,
+.redacted:focus,
+.redacted.revealed{
+    background:transparent;
+    color:#ff4a4a;
+    outline:1px dashed #ff4a4a;
+}
+
+::selection{
+
+    background:#ff4a4a;
+    color:black;
+
+}
+
+/* Animations */
+
+@keyframes fadeIn{
+
+    from{
+        opacity:0;
+        transform:translateY(20px);
+    }
+
+    to{
+        opacity:1;
+        transform:none;
+    }
+
+}
+
+@keyframes pulse{
+
+    0%,100%{
+        box-shadow:0 0 0 rgba(255,255,255,0);
+    }
+
+    50%{
+        box-shadow:0 0 15px rgba(255,255,255,.25);
+    }
+
+}
+
+@keyframes cursor{
+
+    0%,40%{
+        opacity:1;
+    }
+
+    50%{
+        opacity:.2;
+    }
+
+    60%{
+        opacity:1;
+    }
+
+    70%{
+        opacity:0;
+    }
+
+    100%{
+        opacity:1;
+    }
+
+}
+
+@keyframes warning{
+
+    0%,100%{
+        opacity:1;
+    }
+
+    50%{
+        opacity:.65;
+    }
+
+}
+
+@keyframes gridMove{
+
+    from{
+        transform:translateY(0);
+    }
+
+    to{
+        transform:translateY(40px);
+    }
+
+}
+
+@keyframes terminal{
+
+    0%,97%,100%{
+        filter:brightness(1);
+    }
+
+    98%{
+        filter:brightness(.75);
+    }
+
+    99%{
+        filter:brightness(1.08);
+    }
+
+}
+
+@keyframes glitchTop{
+    0%,90%,100%{ transform:translate(0,0); }
+    91%{ transform:translate(-3px,-1px); }
+    93%{ transform:translate(2px,1px); }
+}
+
+@keyframes glitchBottom{
+    0%,90%,100%{ transform:translate(0,0); }
+    92%{ transform:translate(3px,1px); }
+    95%{ transform:translate(-2px,-1px); }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="vignette"></div>
+<div class="scan-beam"></div>
+
+<div class="box">
+
+<div class="stamp">FILE 01 / 07</div>
+
+<p class="small">UNION ARCHIVE TERMINAL v3.1</p>
+
+<p>&gt; CONNECTING...</p>
+<p>&gt; ACCESS GRANTED</p>
+
+<hr>
+
+<h1 class="glitch" data-text="CASE FILE: THE INCIDENT">CASE FILE: THE INCIDENT</h1>
+
+<p class="red">
+CLASSIFICATION: RESTRICTED
+</p>
+
+<p>
+A series of unexplained events have been connected to one individual.
+<br>
+Further investigation has been authorized.
+<br>
+Read carefully, solve all 7 puzzles.
+</p>
+
+<hr>
+
+<p>
+<strong>SUBJECT:</strong><br>
+<span class="redacted" tabindex="0">CIPRIKAND</span>
+</p>
+
+<p><strong>KNOWN ANOMALIES</strong></p>
+
+<ul>
+
+<li>■ A mazing (?)</li>
+
+<li>■ La "Chamelilize"</li>
+
+<li>■ Jennifer!!!</li>
+
+<li>
+■
+<pre>
+  \         /
+   `-.`-'.-'
+   ,:--.--:.
+  / |  |  | \
+   /\  |  /\
+   | `.:.' |
+</pre>
+</li>
+
+<li>■ The Moon Man (?)</li>
+
+<li>■ Unauthorized Worldbuilding</li>
+
+</ul>
+
+<hr>
+
+<p>
+Investigator clearance has been verified.
+</p>
+
+<a class="button" href="https://avaanis.github.io/try-television/">
+BEGIN INVESTIGATION
+</a>
+
+<p class="small" style="margin-top:30px;">
+Awaiting input<span class="cursor">_</span>
+</p>
+
+</div>
+
+<script>
+// tap-to-reveal for touch devices (hover doesn't exist on mobile)
+document.querySelectorAll('.redacted').forEach(function(el){
+  el.addEventListener('click', function(){
+    el.classList.toggle('revealed');
+  });
+});
+</script>
+
+</body>
+
+</html>
